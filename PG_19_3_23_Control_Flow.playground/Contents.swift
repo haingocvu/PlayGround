@@ -178,3 +178,127 @@ case (let distance, 0), (0, let distance):
 default:
     print("I dont know!!")
 }
+
+//continue statement
+//continue: bỏ qua các dòng lệnh phía sau. tiếp tục tới vòng lặp tiếp
+let _myC : [Character] = ["a", "b", "c", "e", "f"]
+var _result = ""
+
+for item in _myC {
+    switch item {
+    case "a", "e":
+        continue
+    default:
+        _result += String(item)
+    }
+}
+print(_result)
+
+//break: exit khỏi control statement ngay lập tức
+//control statement có thể là if, switch, loop, ...
+//nó khác với continue là quay lại vòng lặp tiếp theo ( chỉ là loop chứ k chứa if hay switch)
+//example for break
+
+//break in loop
+//exit the loop when reach to break statement
+var num = 0
+var total = 0
+while num < 10 {
+    total += num
+    num += 1
+    if num == 5 {
+        break
+    }
+}
+print("total is: \(total)")
+
+//breack in switch statement
+let _c : Character = "z"
+switch _c {
+case "a":
+    print("a")
+default:
+    print("t deo biet")
+    break
+}
+
+//dont need to use break in switch statement
+
+//fallthrough use in switch statement. nó nhảy luôn vô body của case tiếp theo mà k cần check condition
+//nói chung là không cần dùng. biết cho vui
+var rs = ""
+let cc : Int = 2
+switch cc {
+case 2:
+    rs += "thu 2 "
+    fallthrough
+case 10:
+    rs += "t deo biet"
+default:
+    break
+}
+print(rs)
+
+//nói chúng là chỉ cho vui. chả có tác dụng
+
+//Labeled Statement
+//sử dụng kết hợp vs break và continue. nhằm làm cho break và continue trở nên clear hơn
+//example snakes ladders
+let finalSquare2 = 25
+var board2 = [Int](repeating: 0, count: finalSquare + 1)
+board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
+board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
+var square2 = 0
+var diceRoll2 = 0
+var count2 = 0
+gameLoop : while square2 != finalSquare2 {
+    diceRoll2 = Int.random(in: 1...4)
+    count2 += 1
+    switch square2 + diceRoll2 {
+    case finalSquare2:
+        break gameLoop
+    case let x where x > finalSquare2:
+        continue gameLoop
+    default:
+        square2 += diceRoll2
+        square2 += board2[square2]
+    }
+}
+print("you take \(count2) times to complete the game")
+
+
+//guard is the same as if
+//but guard always have an else block
+//if the else block occur, you must write the code to exit the block where guard statement placing (use return, continue, break, throw, fatalError
+//example
+var _loverAge = 16
+func checkIfDiTu(age: Int) -> String {
+    guard age >= 18 else {
+        return "di tu roi thang ngu"
+    }
+    return "thom roi"
+}
+print(checkIfDiTu(age: _loverAge))
+
+//guard with optional value
+func checkAge(age: Int?) {
+    //make sure age is not nil
+    guard let _age = age else {
+        return
+    }
+    print("tuoi la: \(_age)")
+}
+
+checkAge(age: 18)
+
+//guard else kiểu như là: chắc chắn rằng ... nếu không thì ...
+//chắc chắn con kia từ 18 tuổi nếu không thì đi tù sml
+//chắc chắn là có connection, nếu không thì ném ra lỗi
+
+
+//Checking API Availability
+guard #available(iOS 10, macOS 10.12, *) else {
+    print("old version")
+    fatalError("too old version")
+}
+print("new version")
