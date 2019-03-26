@@ -131,3 +131,29 @@ if let _rs10 = sayHiDefault(name: "Uyen Nhi") {
 } else {
     print("Chao Anonymous")
 }
+
+//Variadic Parameter
+func calSum(_ numbers : Int ...) -> Int {
+    var total = 0
+    for num in numbers {
+        total += num
+    }
+    return total
+}
+print("total is :\(calSum(1, 2, 3, 8))")
+//each function has ONLY ONE variadic parameter
+
+//In-Out Parameters
+
+//change the function's parameter value
+func addThree(num: inout Int) {
+    num += 3
+}
+var _a = 8
+print(_a)
+addThree(num: &_a)
+print(_a)
+//only use inout parameter with var (not let or literal value)
+//the below line will cause a error when compiling the code
+//addThree(num: 8)
+//in-out parameters cannot have a default values and variadic parameter (...) cannot be marked as inout parameter
