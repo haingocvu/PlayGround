@@ -157,3 +157,74 @@ print(_a)
 //the below line will cause a error when compiling the code
 //addThree(num: 8)
 //in-out parameters cannot have a default values and variadic parameter (...) cannot be marked as inout parameter
+
+//Function Type
+//every function has a specific function type, made up of the parameters type and the return type of the function
+//for example
+func add2Number(num1 : Int, num2 : Int) -> Int {
+    return num1 + num2
+}
+//the above function has a type as (Int, Int) -> Int
+//another example for the type of the function
+func sayHiHello() {
+    print("hi, good morning")
+}
+//the above function has a type as () -> void
+
+//Using function TYPE
+//simple using function type just like other types in swift
+//for example
+let _addNumber : (Int, Int) -> Int = add2Number
+print("the result is: \(_addNumber(2, 8))")
+
+//you can let swift infer the type of the function
+let _addNum2 = add2Number
+print("total is: \(_addNum2(2, 9))")
+
+//Function Type as Parameters Type
+//pass a function as a parameter of another function
+func printSumof2Numbers(functionSum : (Int, Int) -> Int, num1 : Int, num2 : Int) {
+    print("the sum of \(num1) + \(num2) = \(functionSum(num1, num2))")
+}
+
+printSumof2Numbers(functionSum: add2Number, num1: 2, num2: 8)
+
+//function type as return type
+//function return another function
+//example
+func stepBackward(_ input : Int) -> Int {
+    return input - 1
+}
+
+func stepForward(_ input : Int) -> Int {
+    return input + 1
+}
+
+func chooseStepFunction(isBackward : Bool) -> (Int) -> Int {
+    if isBackward {
+        return stepBackward
+    } else {
+        return stepForward
+    }
+}
+let chooStep = chooseStepFunction(isBackward: false)
+print("now the function is backward. the value after add 1 is : \(chooStep(8))")
+
+//Nested Function
+//Nested Function is a function inside the body of the other function
+//rewrite the chooseStepFunction with nested function stepBackward and stepForward
+func chooStepfunc(isBackward : Bool) -> (Int) -> Int {
+    func stepbackward(_ input : Int) -> Int {
+        return input - 1
+    }
+    func stepForward(_ input : Int) -> Int {
+        return input + 1
+    }
+    if isBackward {
+        return stepBackward
+    }
+    return stepForward
+}
+
+let _chooseStep2 = chooStepfunc(isBackward: true)
+print("now the choose step function is stepbackward. the value after - 1 is : \(_chooseStep2(9))")
