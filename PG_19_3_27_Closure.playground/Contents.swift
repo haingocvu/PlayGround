@@ -20,7 +20,7 @@ import UIKit
 //Example
 
 //use normal function
-let names = ["Nhi", "Giang", "Anh", "Ngoc", "Nga"]
+let names = ["N", "G", "A", "N", "T"]
 func backWard(_ s1: String,_ s2: String) -> Bool {
     return s1 >= s2
 }
@@ -54,3 +54,83 @@ print(reverseName4)
 //example
 let reverseName5 = names.sorted(by: { $0 > $1 })
 print(reverseName5)
+
+//Operator Methods
+let reversename6 = names.sorted(by: > )
+print(reversename6)
+
+//Trailing Closures
+//if you need to pass a closure expresstion to a function as the last function's arguments
+//and the closure expresstion is too long, it can be useful to write it as a trailing closure instead
+//trailing closure is written after function call's parentheses
+//when using trailing function, you dont need to write the argument label for the closure as a part of the function call
+//example
+func doAction(num1 : Int, num2 : Int, action : (Int, Int) -> Int) -> Int {
+    return action(num1, num2)
+}
+//dont use trailing closure
+let _add = doAction(num1: 2, num2: 8, action: { num1, num2 in num1 + num2 })
+print("total is: \(_add)")
+let _sub = doAction(num1: 8, num2: 2, action: {num1, num2 in num1 - num2})
+print("sub is: \(_sub)")
+//using trailing closure
+
+let _mul = doAction(num1: 2, num2: 8) { num1, num2 in num1 * num2 }
+print("Mul is: \(_mul)")
+//nói 1 cách đơn giản: trailing closure là 1 closure expression mà là tham số cuối cùng của 1 function. khi đó ta bỏ cái label parameter của nó trong cặp dấu ngoặc đơn của lời gọi hàm đi, đem nguyên closure đó để sau cặp dấu parentheses "()"
+//của lời gọi function.
+//các quy tắc khác thì y như các viết closure expression
+
+let _divide = doAction(num1: 16, num2: 2) { _num1, _num2 in _num1/_num2 }
+print("divide is : \(_divide)")
+
+//using trailing closure for sorted function
+//shorthand argument names
+let reverseName7 = names.sorted() { $0 > $1 }
+print(reverseName7)
+//without shorthand argument names
+let reverseName8 = names.sorted() { n1, n2 in n1 > n2 }
+print(reverseName8)
+
+//nếu 1 function chỉ nhận duy nhất 1 argument là closure thì khi viết trailing closure, ta không cần phải viết cặp dấu "()" nữa.
+//example
+let reverseName9 = names.sorted { $0 > $1 }
+print(reverseName9)
+//because the sorted method take only one argument so we can ommit the pair of parentheses
+
+func mymap(_ arr: [Any], _ mappedFunc : (Any) -> Any) -> [Any] {
+    var newArr = [Any]()
+    for item in arr {
+       let newItem = mappedFunc(item)
+        newArr.append(newItem)
+    }
+    return newArr
+}
+let myArr1 = [1, 2, 3, 4, 5, 6]
+let newArr1 = mymap(myArr1) { item in "số \(item)" }
+print(newArr1)
+
+//another example for trailing closure
+let arrayOfNumbers = [18, 9, 128]
+let dictionaryForMappy : [Int : String] = [
+    0 : "Zero",
+    1 : "One",
+    2 : "Two",
+    3 : "Three",
+    4 : "Four",
+    5 : "Five",
+    6 : "Six",
+    7 : "Seven",
+    8 : "Eight",
+    9 : "Nine"
+]
+let newArrayOfNumberAfterMapped = arrayOfNumbers.map { item -> String in
+    var num = item
+    var newItem = ""
+    repeat {
+        newItem = dictionaryForMappy[num%10]! + newItem
+        num /= 10
+    } while num > 0
+    return newItem
+}
+print(newArrayOfNumberAfterMapped)
