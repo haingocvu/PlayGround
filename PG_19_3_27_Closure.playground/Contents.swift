@@ -134,3 +134,53 @@ let newArrayOfNumberAfterMapped = arrayOfNumbers.map { item -> String in
     return newItem
 }
 print(newArrayOfNumberAfterMapped)
+
+//Capturing Values
+//a closure can capturing the constans and variables from the surrounding context in which it is defined
+//the closure can then refer to or modify the value of those constants and variable from within its body,
+//even if, the original scope that defined the constants and variables no longers exists
+//khái niệm này tương tự như là closure bên javascript
+
+//simple form of closure that can capture the values is nested function
+//nested function can capture any of its outer function's arguments and can also capture the variables and constants within its outer function's body
+
+//example
+func makeIncrementer(forIncrement amount : Int) -> () -> Int {
+    var runningTotal = 0
+    func incrementer() -> Int {
+        runningTotal += amount
+        return runningTotal
+    }
+    return incrementer
+}
+let incrementerby2 = makeIncrementer(forIncrement: 2)
+print("lan 1: \(incrementerby2())")
+print("lan 2: \(incrementerby2())")
+print("lan 3: \(incrementerby2())")
+print("lan 4: \(incrementerby2())")
+print("lan 5: \(incrementerby2())")
+print("lan 6: \(incrementerby2())")
+
+//amazing, right?
+//make increamenter by 10
+let incrementerByTen = makeIncrementer(forIncrement: 10)
+print("by ten 1: \(incrementerByTen())")
+print("by ten 2: \(incrementerByTen())")
+print("by ten 3: \(incrementerByTen())")
+print("by ten 4: \(incrementerByTen())")
+print("by ten 5: \(incrementerByTen())")
+print("by ten 6: \(incrementerByTen())")
+
+//2 thằng incrementer 2 và ten ở trên capturing reference đến outer function variable của riêng nó. k ảnh hưởng gì nhau.
+//tức là 2 reference khác nhau
+
+//CLOSURES ARE REFERENCE TYPE
+//EXAMPLE
+let incrementBy8 = makeIncrementer(forIncrement: 8)
+let alsoIncrementBy8 = incrementBy8
+print("inc by 8 s 1 : \(incrementBy8())")
+print("inc by 8 s 2 : \(incrementBy8())")
+print("inc by 8 s 3 : \(alsoIncrementBy8())")
+print("inc by 8 s 4 : \(alsoIncrementBy8())")
+//amazing, right?
+
