@@ -49,7 +49,8 @@ let reverseName4 = names.sorted(by: {s1, s2 in s1 > s2})
 print(reverseName4)
 
 //Shorthand Argument names
-//used in inline-closure (closure that is passed as an argument of the function)
+//used in inline-closure (closure that is passed as an argument of the function ?? hoặc là closure chỉ có 1 dòng, tức là closure chỉ cần return thui chứa
+//1 dòng return thui)
 //ommit all. use shorthand arguments name in the closure body
 //example
 let reverseName5 = names.sorted(by: { $0 > $1 })
@@ -184,3 +185,104 @@ print("inc by 8 s 3 : \(alsoIncrementBy8())")
 print("inc by 8 s 4 : \(alsoIncrementBy8())")
 //amazing, right?
 
+//Escaping Closures
+
+var completionhandlers : [() -> Void] = []
+
+func someFunctionWithEscapingClosure(closure : @escaping () -> Void) -> Void {
+    completionhandlers.append(closure)
+}
+
+//khi sử dụng @escaping closure thì khi sử dụng bên trong 1 class. để truy xuất đến property của class thì ta phải dùng self.
+//example
+func someFunctionWithNonEscapingClosure(closure: () -> Void) -> Void {
+    closure()
+}
+
+class SomeClass {
+    var x = 10
+    func doSomeThing() {
+        someFunctionWithEscapingClosure {
+            self.x = 100
+        }
+        someFunctionWithNonEscapingClosure {
+            x = 200
+        }
+    }
+}
+
+var _ca = SomeClass()
+_ca.doSomeThing()
+print("x before using escaping closure: \(_ca.x)")
+completionhandlers.first?()
+print("x after using escaping closure: \(_ca.x)")
+
+//amazing, right?
+
+//Auto Closure
+//AutoClosure is a closure automatically created to wrap an expression that being passed as an argument to a function. It doesn't take any arguments, and when it's call, it return the value of the expression that is wrapped inside it
+//khi gọi hàm chứa autoclosure thì ta không cần phải sủ dụng dấu ngoặc nhọn bao cái closure lại
+//an expression có nghĩa là closure chỉ chứa duy nhất 1 dòng lệnh. k tham số.
+
+//it's common to call a fucntion that takes autolosure, but it's not common to implement that kind of function
+
+//An Autoclosure lets you delay evaluation, because the code inside isn't run until you call the closure
+//Delaying evaluation is useful for code that has side effects
+
+//this code below show how a closure delays evaluation
+
+var customerInline = ["Nhi", "Giang", "Anh"]
+print("length: \(customerInline.count)")
+
+let customerProvider = { customerInline.remove(at: 0) }
+print("leghth: \(customerInline.count)")
+
+print("Now serving \(customerProvider())")
+print("length: \(customerInline.count)")
+
+//delaying evaluation when passing a closure as an arguments to a function
+func serve(customer customerProvider : () -> String) {
+    print("Now serving \(customerProvider())")
+}
+serve(customer: { customerInline.remove(at: 0) })
+
+//Now we use autoclosure
+//ok, let's go
+
+//rewrite the function above with autoclosure @autoclosure
+
+func serveAutoClosure(customer customerProvider : @autoclosure () -> String) {
+    print("Now Serving \(customerProvider())")
+}
+//we need to pass an expression to the right of customer that when execute the expression, we got the return value of string
+//ok, do it
+serveAutoClosure(customer: customerInline.remove(at: 0))
+
+//ok, đơn giản là 1 closure mà ở dạng đơn giản nhất (tức là closure k có tham số, chỉ bao gồm 1 dòng lệnh) thì
+//khi đó ta có thể make closure đó như là autoclosure (thêm @autoclosure trước kiểu của closure khi khai báo closue đó là tham số của function
+//khi 1 function chứa autoclosure thì đơn giản là khi gọi function đó, ở bước truyền tham số là autoclosure cho function đó...
+//ta chỉ cần bỏ luôn cái cặp dấu "{}" (cặp dấu "{}" được dùng chứa closure)
+//như ta thấy ở trên khi gọi hàm serveAutoClosure. ta đã truyền vào customer 1 autoclosure
+//nhìn thì có vẻ như ta đang truyền vào 1 kiểu string cho tham số customer của hàm serveAutoClosure
+//nói chung autoclosure rất dễ gây hiểu nhầm
+
+//AutoClosure and Escaping
+
+var myCrushs = ["Nhi", "Giang", "Anh"]
+var customerProviders : [() -> String] = []
+
+func collectCustomerProvider(_ closure : @escaping @autoclosure () -> String) {
+    customerProviders.append(closure)
+}
+
+collectCustomerProvider(myCrushs.remove(at: 0))
+collectCustomerProvider(myCrushs.remove(at: 0))
+
+print("Collected \(customerProviders.count) closures")
+
+for closure in customerProviders {
+    print("Now serving: \(closure())")
+}
+
+//amazing, right?
+//but very hard to understand?
