@@ -134,3 +134,41 @@ print("current gender of Hai is: \(_Hai)")
 
 //CLASSES ARE REFERENCE TYPES
 
+//example
+//khi 1 biến hay hằng số được gán giá trị của 1 class thì biến đó k thực tế lưu giá trị của class
+//nó chỉ reference đến instance của class đó
+//cho nên ta vẫn có thể dùng let để khai báo 1 biến mà nhận vào instance của 1 class mà vẫn có thể thay đổi giá trị của biến đó
+
+let _videoMode1 = VideoMode(interlaced: false, framerate: 29, name: "mode 1")
+let _videoMode2 = _videoMode1
+print("init framerate of videomode 1: \(_videoMode1.frameRate)")
+print("init framerate of videomode 2: \(_videoMode2.frameRate)")
+
+_videoMode2.frameRate = 39
+print("current framerate of videomode 1: \(_videoMode1.frameRate)")
+print("current framerate of videomode 2: \(_videoMode2.frameRate)")
+
+//as you can see, when we set the new value for framerate property of _videomode2.
+//This's also change the framerate of _videomode1
+//because both reference to the same instance.
+//amazing, right?
+
+//IDENTITY OPERATORS
+// use === or !== to check whether 2 constant or variable prefer to exactly the same instance of a class
+//nó như so sánh bằng kiểu dữ liệu và bằng giá trị như javascript
+//=== hay !== chỉ được dùng cho reference type? right?
+//example
+if _videoMode1 === _videoMode2 {
+    print("videomode1 and videomode2 prefer to the same instance of VideoMode class")
+} else {
+    print("videomode1 and videomode2 dont prefer to the same instance of VideoMode class")
+}
+
+//khi định nghĩa struct and class thì ta có trách nhiệm define luôn 2 toán tứ == và != cho kiểu struct hay class đó, nếu ta muốn sử dụng 2 toán tử đó để so sánh 2 instance của class đó
+//vì đơn giản 2 toán tử == và != chỉ evaluate được trên những kiểu dữ liệu cơ bản
+
+//Pointers
+//khi 1 biến prefer đến 1 instance của 1 class (reference type) thì nó similar như pointer trong các ngôn ngữ c c++
+//tuy nhiên swift không trực tiếp trỏ đến 1 đại chỉ vùng nhớ.
+//nói chung có dùng như bình thường. k cần quan tâm đến * hay gì của c++ cho phức tạp
+//khó quá đã có swift lo
