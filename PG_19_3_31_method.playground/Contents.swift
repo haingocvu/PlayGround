@@ -180,3 +180,97 @@ if player2.tracker.advance(to: 12) {
 } else {
     print("level: 12 is not unlocked yet")
 }
+
+//Subscript
+//Accessing an item in a collection with index (balls[1])
+//you can use subscript in class, enum, struct
+//as below
+
+struct SPerson {
+   var name = "Nhi"
+   var age =  18
+   var gender = Gender.Male
+    subscript(index : Int) -> Any? {
+        set {
+            switch index {
+            case 0:
+                self.name = newValue as! String
+            case 1:
+                self.age = newValue as! Int
+            case 2:
+                self.gender = newValue as! Gender
+            default:
+                break
+            }
+        }
+        get {
+            switch index {
+            case 0:
+                return self.name
+            case 1:
+                return self.age
+            case 2:
+                return self.gender
+            default:
+                return nil
+            }
+        }
+    }
+    subscript(_name : String) -> Any? {
+        get {
+            switch _name {
+            case "name":
+                return self.name
+            case "age":
+                return self.age
+            case "gender":
+                return self.gender
+            default:
+                return nil
+            }
+        }
+    }
+}
+
+var person3 = SPerson()
+//get name of person3
+print("current person3 name: \(person3[0]!)")
+//set new name for person3
+person3[0] = "Nguyen Thuy Uyen Nhi"
+//get name again
+print("new name for person3 is: \(person3[0] ?? "")")
+print("age for person3 is: \(person3["age"]!)")
+
+//another example for subscript
+
+struct Matrix {
+    var rows : Int
+    var columns : Int
+    var grid : [Double]
+    init(rows : Int, columns : Int) {
+        self.rows = rows
+        self.columns = columns
+        self.grid = Array(repeating: 0.0, count: self.columns * self.rows)
+    }
+    @discardableResult
+    func isvalidIndex(row : Int, column : Int) -> Bool {
+        return row >= 0 && row <= self.rows && column >= 0 && column <= self.columns
+    }
+    subscript(row : Int, column : Int) -> Double {
+        get {
+            assert(isvalidIndex(row: row, column: column), "Out of index")
+            return self.grid[row * columns + column]
+        }
+        set {
+            assert(isvalidIndex(row: row, column: column), "Out of index")
+            self.grid[row * columns + column] = newValue
+        }
+    }
+}
+
+var matrix = Matrix(rows: 2, columns: 3)
+matrix[0, 1] = 2.3
+matrix[1, 2] = 4.8
+
+print("matrix value of [0, 1] is: \(matrix[0, 1])")
+print("matrix value of [1, 2] is: \(matrix[1, 2])")
