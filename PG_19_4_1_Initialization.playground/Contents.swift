@@ -214,6 +214,128 @@ print("center rect: (\(centerRect.point.x), \(centerRect.point.y))")
 
 
 //Initializer Inheritance and Overriding
-//swift subclass dont inherit their supperclass initializers
+//swift subclass dont inherit their supperclass initializers by default
+//nếu hàm init của subclass mà matching (hình như là trùng tên tham số và kiểu dữ liệu tham số với hàm init của super class thì bắt buộc ta phải override
+//khi override thì ta có thể override 1 designated init của lớp cha thành convenience init của thằng con
+//hoặc ngược lại override 1 convenience của thằng cha thằng designated init của thằng con
 
+//example
+class MyVehicle {
+    var numberOfWheels = 0
+    var description : String {
+        return "\(numberOfWheels) wheels"
+    }
+}
 
+// do class MyVehicle k có phương thức khởi tạo cho nên nó sẽ nhận default initializer
+var myVehicle1 = MyVehicle()
+print("Vehicle: \(myVehicle1.description)")
+
+class Bicycle : MyVehicle {
+    var color : String
+    override init() {
+        //setting value for itself property
+        self.color = "blue"
+        //call super class init
+        super.init()
+        //custom value
+        numberOfWheels = 2
+    }
+    override var description: String {
+        return "\(numberOfWheels) wheels and \(color)"
+    }
+}
+
+//hàm init của Bicycle override lại init của MyVehicle. do đó ta phải sử dụng override
+var bicycle1 = Bicycle()
+print("Bicycle: \(bicycle1.description)")
+
+//AUTOMATIC INITIALIZER INHERITANCE
+//GIẢ SỬ bạn đã gán default value cho tất cả các properties bạn đã define trong subclass
+//thì 2 rule sau đây sẽ được áp dụng:
+
+//RULE 1:
+//nếu bạn cưa khai báo bất cứ designated initializer nào cho subclass thì subclass sẽ tự động kế thừa tất cả designated initializers của thằng cha
+//key to remember: con tay trắng thì xin cha
+
+//RULE 2:
+//nếu subclass có TẤT CẢ designated initializers của lớp cha.
+//bất chấp nó có được bằng rule 1: kế thừa
+//hoặc là nó có được bằng cách custom implement (override)
+//thì nó sẽ kế thừa tất cả convenience initializers của lớp cha
+//key to remember: được voi đòi tiên
+//lấy hết rồi còn đòi lấy thêm
+
+//exmaple
+
+class Food {
+    var name : String
+    //designated
+    init(name : String) {
+        self.name = name
+    }
+    //convenience init
+    convenience init() {
+        //giải thích tại sao phải để chữ convenience ở đầu hàm init này
+        //lý do là nếu k có chữ convenience thì hàm init này là 1 designated initializer
+        //mà như ta biết thì designated initializer không thể nào delegate (call) cùng cấp được (call init của chính nó)
+        //nó phải delegate up (call lên lớp cha). cho nên phải có annotation @convenience ở đầu hàm init này để ám chỉ nó là convenience init
+        //ok?
+        self.init(name: "unnamed")
+    }
+}
+
+//let take some sample on Food class
+var food1 = Food(name: "apple")
+print(food1.name)
+var food2 = Food()
+print(food2.name)
+
+//RecipeIngredient will inherit Food
+
+class RecipeIngredient : Food {
+    var quantity : Int
+    //designated init của ipeIngredient
+    //bên trong hàm có delegate up đến lớp cha (food)
+    init(name : String, quantity : Int) {
+        self.quantity = quantity
+        super.init(name: name)
+    }
+    //ở đây ta sẽ override hàm designated init của thằng cha (food) thành convenience init của thằng con (recipeingredient)
+    convenience override init(name: String) {
+        self.init(name: name, quantity: 1)
+    }
+}
+
+//khi này theo rule 2 ở trên thì thằng RecipeIngredient sẽ có hàm convenience init của thằng cha (food)
+//do đó t mới có cái hay ho sau
+var recipe1 = RecipeIngredient()
+print(recipe1.quantity)
+
+//amazing, right?
+
+//tiếp theo ta sẽ có class Shopping List Item kế thừa class RecipeIngredient
+
+class ShoppingListItem : RecipeIngredient {
+    var purchased = false
+    var description : String {
+        var output = "\(quantity) x \(name)"
+        output += purchased ? " ✔" : " ✘"
+        return output
+    }
+}
+
+//vì class ShoppingListItem đã gán giá trị cho tất cả các property của nó by default
+//nó k implement bất cứ designated init nào do đó nó kế thừa tất cả designated init của thằng cha (RecipeIngredient)
+//vì nó kế thừa tất cả designated init của thằng cha cho nên nó cũng kế thừa tất cả convenience init của thằng cha theo như rule 2
+
+var breakFastList = [
+    ShoppingListItem(),
+    ShoppingListItem(name: "Bacon"),
+    ShoppingListItem(name: "Eggs", quantity: 6)
+]
+breakFastList[0].name = "orange juice"
+breakFastList[0].purchased = true
+for item in breakFastList {
+    print(item.description)
+}
