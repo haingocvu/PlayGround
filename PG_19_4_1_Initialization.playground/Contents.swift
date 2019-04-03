@@ -339,3 +339,197 @@ breakFastList[0].purchased = true
 for item in breakFastList {
     print(item.description)
 }
+
+//Failable Initializers
+//để define failable init ta thêm ? sau chữ init (init?)
+//có thể có failable và non-failable init có cùng tham số và kiểu dữ liệu của tham số
+//để xác định hàm init đó failure, ta return nil trong body của init đó
+
+//ví dụ như hàm convert sang Int
+
+var wholeNumber : Double = 12345.0
+var pi = 3.14159
+
+var rs1 = Int(exactly: wholeNumber)
+if let _rs1 = rs1 {
+    print("convert ok: \(_rs1)")
+}
+
+var rs2 = Int(exactly: pi)
+if rs2 == nil {
+    print("can not convert : \(pi)")
+}
+
+struct Animal {
+    var species : String
+    init?(species : String) {
+        if species.isEmpty {
+            return nil
+        }
+        self.species = species
+    }
+}
+
+var someCreature = Animal(species: "Giraffi")
+if let giraffi = someCreature {
+    print("an animal was initialized with a species of \(giraffi.species)")
+}
+
+let anonymousCreature = Animal(species: "")
+if anonymousCreature == nil {
+    print("anonymous can't be initialized")
+}
+
+//failable init for enum
+
+enum TemperatureUnit {
+    case kelvin
+    case Censius
+    case Fahrenheit
+    init?(symbol : Character) {
+        switch symbol {
+        case "F":
+            self = .Fahrenheit
+        case "C":
+            self = .Censius
+        case "K":
+            self = .kelvin
+        default:
+            return nil
+        }
+    }
+}
+
+var fahrenheitUnit = TemperatureUnit(symbol: "F")
+if let f = fahrenheitUnit {
+    print("init ok: \(f)")
+}
+
+var xx = TemperatureUnit(symbol: "L")
+if xx == nil {
+    print("failed to init temperature: X")
+}
+
+//ENUM failable init with rawValue
+
+enum Temp : Character{
+    case Kelvin = "K"
+    case Censius = "C"
+    case Fahrenheit = "F"
+}
+
+var TinF = Temp(rawValue: "F")
+if let f = TinF {
+    print("init success: \(f)")
+}
+
+var xxx = Temp(rawValue: "X")
+if xxx == nil {
+    print("init failed of X")
+}
+
+//Failable Init có thể delegate across or up
+
+class Product {
+    var name : String
+    init?(name : String) {
+        if name.isEmpty {
+            return nil
+        }
+        self.name = name
+    }
+}
+
+class CartItem : Product {
+    var quantity : Int
+    init?(name: String, quantity : Int) {
+        if quantity < 1 {
+            return nil
+        }
+        self.quantity = quantity
+        super.init(name: name)
+    }
+}
+
+//check thử
+
+var okCartItem = CartItem(name: "Apple", quantity: 2)
+if let okcart = okCartItem {
+    print("ok. Item: \(okcart.name) - quantity: \(okcart.quantity)")
+}
+
+var nonameCart = CartItem(name: "", quantity: 2)
+if nonameCart == nil {
+    print("failed to init cart with noname")
+}
+
+var zeroQuantityCart = CartItem(name: "Strawberry", quantity: 0)
+if zeroQuantityCart == nil {
+    print("failed to init cart with zero item")
+}
+
+//Override Failable Init tương tự như override init khác
+//ta có thể override 1 failable init thành 1 un-failable init
+
+class Document {
+    var name : String?
+    init() {
+    }
+    init?(name : String) {
+        if name.isEmpty {
+            return nil
+        }
+        self.name = name
+    }
+}
+
+class AutomaticallyNamedDocument : Document {
+    override init() {
+        super.init()
+        self.name = "Untitled"
+    }
+    
+    override init(name: String) {
+        super.init()
+        if name.isEmpty {
+            self.name = "Untitled"
+        } else {
+            self.name = name
+        }
+    }
+}
+
+//You can use forced unwrapping in an initializer to call a failable initializer from the superclass as part of the implementation of a subclass’s nonfailable initializer.
+
+class UntitledDocument : Document {
+    override init() {
+        super.init(name: "Untitled")!
+    }
+}
+
+//NOTE
+//ngoài ra ta có thể dùng init!
+//tương tự như cách ta dùng optional type thôi
+//unwrapped ngâm định
+//ta không cần phải dùng if let đồ nữa
+
+//You can delegate from init? to init! and vice versa, and you can override init? with init! and vice versa. You can also delegate from init to init!, although doing so will trigger an assertion if the init! initializer causes initialization to fail.
+
+//Required Initializers
+
+///Write the required modifier before the definition of a class initializer to indicate that every subclass of the class must implement that initializer:
+//Không cần viết override
+//You do not write the override modifier when overriding a required designated initializer
+
+class SomeClass {
+    required init() {
+    }
+}
+
+class SomeSubclass : SomeClass {
+    required init() {
+    }
+}
+
+//Setting a Default Property Value with a Closure or Function
+
