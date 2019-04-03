@@ -532,4 +532,30 @@ class SomeSubclass : SomeClass {
 }
 
 //Setting a Default Property Value with a Closure or Function
+//cái này giống như là dùng getter bình thường
+//nó khác getter ở chỗ là nó có dấu =. còn getter thì k
+//mà ta phải dùng cặp () để execute getter (closure) đó ngay lập tức
 
+//NOTE
+//If you use a closure to initialize a property, remember that the rest of the instance has not yet been initialized at the point that the closure is executed. This means that you cannot access any other property values from within your closure, even if those properties have default values. You also cannot use the implicit self property, or call any of the instance’s methods.
+
+class ChessBoard {
+    var boardColors : [Bool] = {
+        var temBoard = [Int]()
+        var isBlack = false
+        for i in 1...8 {
+            for j in 1...8 {
+                temBoard.append(isBlack)
+                isBlack = !isBlack
+            }
+            isBlack = !isBlack
+        }
+    }()
+    func squareIsBlackAt(row : Int, column : Int) -> Bool {
+        return boardColors[(row*8) + column]
+    }
+}
+
+var board1 = ChessBoard()
+print(board1.squareIsBlackAt(row: 1, column: 4))
+print(board1.squareIsBlackAt(row: 2, column: 8))
