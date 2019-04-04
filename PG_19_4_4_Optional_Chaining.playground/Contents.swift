@@ -193,3 +193,57 @@ print(testScores)
 //ok?
 
 
+//Linking Multiple Levels of Chaining
+
+//If the type you are trying to retrieve is not optional, it will become optional because of the optional chaining.
+//If the type you are trying to retrieve is already optional, it will not become more optional because of the chaining.
+
+//If you try to retrieve an Int value through optional chaining, an Int? is always returned, no matter how many levels of chaining are used.
+
+//Similarly, if you try to retrieve an Int? value through optional chaining, an Int? is always returned, no matter how many levels of chaining are used.
+
+//example
+
+if let terryStreet = terry.residence?.address?.street {
+    print("Terry street is: \(terryStreet)")
+} else {
+    print("unable to retrieve the address")
+}
+
+//try to create an address not nil
+var addres = Address()
+addres.buildingName = "Building of Nhiiii"
+addres.street = "Nguyen Thi Minh Khai"
+terry.residence?.address = addres
+if let adds = terry.residence?.address?.street {
+    print("street of Nhi : \(adds)")
+} else {
+    print("unable to find the address")
+}
+
+
+//Chaining on Methods with Optional Return Values
+
+//tương tự như properties, thì method cũng vậy
+
+if let buidingIdentifier = terry.residence?.address?.buildingIdentifier() {
+    print("terry's building identifier is: \(buidingIdentifier)")
+} else {
+    print("unable finding the indentifier")
+}
+
+//muốn chain sâu hơn
+
+if let endWithNhiiii = terry.residence?.address?.buildingIdentifier()?.hasSuffix("Nhiiii") {
+    if endWithNhiiii {
+        print("Nha cua Nhiii")
+    } else {
+        print("Ai biet")
+    }
+}
+
+//NÓI TÓM LẠI
+//LÂU LI VÀ DÀI DÒNG VẬY
+//NHUNG CHỦ YẾU LÀ CỨ GẶP OPTIONAL THÌ ?
+// :))
+//OK
