@@ -128,7 +128,7 @@ print("someInt now has value: \(someInt)")
 extension Int {
     subscript(digitIndex: Int) -> Int {
         var decimalBase = 1
-        for _ in 0..<decimalBase {
+        for _ in 0..<digitIndex {
             decimalBase *= 10
         }
         return (self / decimalBase) % 10
@@ -167,15 +167,15 @@ func printItegerKinds(_ numbers: [Int]) {
         case .zero:
             print("0 ", terminator: "")
         case .negative:
-            print("+ ", terminator: "")
-        case .positive:
             print("- ", terminator: "")
+        case .positive:
+            print("+ ", terminator: "")
         }
     }
     print("")
 }
 
-printItegerKinds([1, 4, 0, 2, 6, 8])
+printItegerKinds([-1, 4, 0, 2, 6, 8])
 
 //OK?
 //EASY?
