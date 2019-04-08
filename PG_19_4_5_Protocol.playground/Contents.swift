@@ -277,6 +277,8 @@ protocol GameSucSac {
 }
 
 //dùng anyobject để chỉ ra rằng. protocol này chỉ có thể được conform bởi CLASS (not struct hay enum)
+//nhờ vậy mà ta mới có thể dùng weak ở trong class SnakeAndLadders
+//weak chỉ có thể dùng cho instance của class???
 protocol GameSucSacDelegate: AnyObject {
     func gameDidStart(_ game: GameSucSac)
     func game(_ game: GameSucSac, didStartNewTurnWithDiceRoll diceRoll: Int)
@@ -340,3 +342,79 @@ let tracker = GameSucSacTracker()
 let game = SnakeAndLadders()
 game.delegate = tracker
 game.play()
+
+
+//ADDING PROTOCOL CONFORMANCE WITH AN EXTENSION
+//mở rộng 1 kiểu sẵn có để conform 1 protocol
+
+//example
+
+protocol TextRepresentAble {
+    var textualDescriptions: String { get }
+}
+
+extension SucSac: TextRepresentAble {
+    var textualDescriptions: String {
+        return "A \(sides) sides-dice"
+    }
+}
+
+//try to create a new SucSac
+let sucsau1 = SucSac(sides: 8, randomGenerator: LinearCongruentialGenerator())
+print(sucsau1.textualDescriptions)
+
+
+//tương tự ta cho game snakeandladders conform protocol textrepresentable
+
+extension SnakeAndLadders: TextRepresentAble {
+    var textualDescriptions: String {
+        return "A game of Snake and Ladders with \(finalSquare) squares"
+    }
+}
+
+print(game.textualDescriptions)
+
+
+//CONDITIONALLY CONFORMING TO A PROTOCOL
+//đối với generic type (array, list, ...) thì nó có thể chỉ conform protocol ở trong những trường hợp cụ thể
+//ví dụ như kiểu phần tử của nó conform protocol đó thì nó mới conform protocol đó
+//để biểu diễn điều đó, ta dùng where clause.
+//see generic where clauses
+
+//example
+
+extension Array: TextRepresentAble where Element: TextRepresentAble {
+    var textualDescriptions: String {
+        let itemAsDes = self.map { $0.textualDescriptions }
+        return "[" + itemAsDes.joined(separator: ",") + "]"
+    }
+}
+//đáng nhẽ phải clone deep
+//nhưng làm vầy vì lười, để dễ hình dung ra ta đang có 2 phần tử khác nhau của mảng mà thôi
+let sucsac2 = sucsau1
+let arr1 = [sucsau1, sucsau1]
+
+print(arr1.textualDescriptions)
+
+
+//Declaring Protocol Adoption with an Extension
+//nếu 1 kiểu dữ liệu đã tự nó conform protocol đó rồi mà nó chưa khai báo nó extend protocol đó (adopt)
+//thì ta có thể dùng extension để khai báo type đó extend protocol đó
+//mà không cần phải khai báo phần định nghĩa
+
+//example
+
+struct Hamster {
+    var name: String
+    var textualDescriptions: String {
+        return "A Hamster named is: \(name)"
+    }
+}
+
+extension Hamster: TextRepresentAble{}
+//như trên ta thấy bên trong phần dấu {} không có gì
+//Types don’t automatically adopt a protocol just by satisfying its requirements. They must always explicitly declare their adoption of the protocol.
+
+
+//Collections of Protocol Types
+
