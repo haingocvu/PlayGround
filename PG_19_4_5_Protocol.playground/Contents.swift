@@ -636,3 +636,81 @@ for _ in 0..<4 {
     counter1.increment()
     print(counter1.count)
 }
+
+//another datasource
+
+class TowardZeroSource: NSObject, CounterDataSource {
+    func increment(forCount count: Int) -> Int {
+        switch count {
+        case 0:
+            return 0
+        case let x where x > 0:
+            return -1
+        case let x where x < 0:
+            return 1
+        default:
+            return 0
+        }
+    }
+}
+
+counter1.dataSource = TowardZeroSource()
+counter1.count = -4
+for _ in 0..<4 {
+    counter1.increment()
+    print(counter1.count)
+}
+
+
+//PROTOCOL EXTENSION
+//protocol có thể sử dụng extension để thêm IMPLEMENT methods, init, subscript, computed properties đến TẤT CẢ conforming types của nó
+//Protocol extensions can add implementations to conforming types but can’t make a protocol extend or inherit from another protocol.
+
+//simple example
+
+extension RandomGenerator {
+    func randomBool() -> Bool {
+        return random() > 0.5
+    }
+}
+
+let generator1 = LinearCongruentialGenerator()
+print("here's a random number: \(generator1.random())")
+print("and here's a random boolean: \(generator1.randomBool())")
+
+
+
+//PROVIDING DEFAULT IMPLEMENTATIONS
+//bạn có thể sử dụng protocol extension để cung cấp default implementations của các requirement (methods, computed properties, ...) của
+//của protocol đó. nếu conforming type cung cấp implement của những requirement đó thì implement riêng đó sẽ được dùng
+//còn không thì sử dụng default implement đã được định nghĩa bằng protocol extension
+
+//example
+
+extension PrettyTextrepresentable {
+    var prettyTextualDescription: String {
+        return textualDescriptions
+    }
+}
+//ở trên ta đã cung cấp default getter cho prettyTextualDescription
+
+
+
+//ADDING CONSTRAINTS TO PROTOCOL EXTENSIONS
+//When you define a protocol extension, you can specify constraints that conforming types must satisfy before the methods and properties of the extension are available.
+
+//very simple example
+
+extension Collection where Element: Equatable {
+    func equalAll() -> Bool {
+        for ele in self {
+            if ele != self.first { return false }
+        }
+        return true
+    }
+}
+
+var equalNumbers = [100, 100, 100, 100, 100, 100]
+var differentNumbers = [200, 100, 100, 200, 200, 200]
+print(equalNumbers.equalAll())
+print(differentNumbers.equalAll())
