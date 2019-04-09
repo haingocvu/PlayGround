@@ -417,4 +417,222 @@ extension Hamster: TextRepresentAble{}
 
 
 //Collections of Protocol Types
+//protocol có thể được dùng như kiểu dữ liệu, như bàn ở trên
+//dĩ nhiên là có thể dùng như kiểu dữ liệu của collection type như là array, list, dictionary ...
 
+//example
+
+let thing: [TextRepresentAble] = [game, sucsau1, Hamster(name: "Mickey")]
+for item in thing {
+    print(item.textualDescriptions)
+}
+
+
+//PROTOCOL INHERITANCE
+//một protocol có thể kế thừa được nhiều protocol khác (như interface thôi - chỉ kế thừa từ 1 supper class, tuy nhiên kế thừa từ nhiều interface khác)
+
+//simple example
+
+protocol PrettyTextrepresentable: TextRepresentAble {
+    var prettyTextualDescription: String { get }
+}
+
+extension SnakeAndLadders: PrettyTextrepresentable {
+    var prettyTextualDescription: String {
+        var output = textualDescriptions + ":\n"
+        for i in 0..<finalSquare {
+            switch board[i] {
+            case let ladder where ladder > 0:
+                output += "▲ "
+            case let snake where snake < 0:
+                output += "▼ "
+            default:
+                output += "○ "
+            }
+        }
+        return output
+    }
+}
+
+print(game.prettyTextualDescription)
+
+
+//CLASS ONLY PROTOCOL
+//bạn có thể giới hạn cho 1 protocol chỉ có thể được implement bởi 1 class (thay vì enum, struct)
+//bằng cách cho protocol đó kế thừa từ protocol AnyObject
+
+//example
+
+protocol ClassOnlyProtocol: AnyObject {
+    var name: String { get }
+}
+
+class SomeClassOne: ClassOnlyProtocol {
+    var name: String {
+        return "Hi how are you"
+    }
+}
+//struct hay enum không thể implement protocol ClassOnlyProtocol
+
+
+//PROTOCOL COMPOSITION
+
+
+//không cần giải thích, xem example là sẽ rõ :))
+
+protocol Named {
+    var name: String { get }
+}
+
+protocol Aged {
+    var age: Int { get }
+}
+
+struct PPerson: Named, Aged {
+    var name: String
+    var age: Int
+}
+
+func wishHappyBirthday(to celebrator: Named & Aged) {
+    print("Happy birthday \(celebrator.name), you are \(celebrator.age)")
+}
+
+var nhi = PPerson(name: "Nguyen Thuy Uyen Nhi", age: 20)
+wishHappyBirthday(to: nhi)
+
+//để ý parameter celebrator, nó nhận vào Named & Aged
+//đây gọi là protocol composition
+//nó có nghĩa là sẽ nhận bất cứ kiểu dữ liệu nào mà adopt được 2 protocol là Named và Aged
+//ở đây PPerson là 1 struct và nó đã adopt cả Named và Aged, cho nên nó thoả mãn
+//dùng Named & Aged: nó chỉ tạo ra 1 temp protocol bao gồm cả 2 protocol Named & Aged.
+
+//another example
+
+class Location {
+    var latitude: Double
+    var longitude: Double
+    init(latitude: Double, longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+}
+
+class City: Location, Named {
+    var name: String
+    init(name: String, lititude: Double, longitude: Double) {
+        self.name = name
+        super.init(latitude: lititude, longitude: longitude)
+    }
+}
+
+func beginConcert(in location: Location & Named) {
+    print("Hello, \(location.name)")
+}
+
+let seattle = City(name: "Seattle", lititude: 47.6, longitude: -122.3)
+beginConcert(in: seattle)
+
+//như trên ta thấy, hiểu mở rộng ra, ta có thể combine giữa 1 class và 1 protocol
+//nó có nghĩa là bất cứ kiểu dữ liệu nào mà có supper class là Location và adopt protocol Named
+//ở đây, thằng City nó có supper class là Location và nó adopt protocol Named.
+//do đó nó thoả điều kiện
+
+
+//CHECKING FOR PROTOCOL CONFORMANCE
+//use (is & as) to check for protocol conformance
+
+//example
+
+protocol HasArea {
+    var area: Double { get }
+}
+
+class Circle: HasArea {
+    let pi = 3.141519
+    var radius: Double
+    init(radius: Double) {
+        self.radius = radius
+    }
+    var area: Double {
+        return radius * radius * pi
+    }
+}
+
+class Country: HasArea {
+    var area: Double
+    init(area: Double) {
+        self.area = area
+    }
+}
+
+class Animal {
+    var legs: Int
+    init(legs: Int) {
+        self.legs = legs
+    }
+}
+
+let objects: [AnyObject] = [
+    Country(area: 222_888),
+    Circle(radius: 2.0),
+    Animal(legs: 2)
+]
+//AnyObject đại diện cho 1 class nào đó
+
+for obj in objects {
+    if let objWithArea = obj as? HasArea {
+        print("Area is: \(objWithArea.area)")
+    } else {
+        print("something went wrong")
+    }
+}
+
+
+//OPTIONAL PROTOCOL REQUIREMENTS
+//optional requirement có nghĩa là khi adopt protocol đó thì ta có thể implement optional requirements đó
+//hoặc là không cần implement ( đó là nghĩa của từ optional)
+//optional requirements phải được mark với từ optional
+//cả protocol và optional requirement phải được mark với @objc
+//opbjectc protocol chỉ có thể được adopt bởi 1 class kế thừa từ object-c classes hoặc @objc classes
+//chúng không thể được adopt bởi enum or struct
+//optional requirement tự chuyển thành kiểu optional
+//ví dụ hàm (Int) -> String mà là optional thì nó sẽ trở thành ((Int) -> String)?
+//chú ý là nguyên hàm trở thành optional chứ không phải là chỉ mỗi kiểu trả về
+//chú ý điều này để dùng trong optional chaining
+//NOTE: CHÚ Ý 2 CÁCH VIẾT SAU ĐÂY
+//C1: someOptionalMethod(someArgument)?
+//cách viết 1 thì ý là hàm someOptionalMethod có kiểu trả về là optional
+//C2: someOptionalMethod?(someArgument)
+//viết theo cách 2 thì nguyên cái hàm someoptionalMethod là 1 optional. có nghĩa là:
+//là hàm someOptionalmethod có thể có or không (=nil)
+//nên chú ý điều này
+
+@objc protocol CounterDataSource {
+    @objc optional func increment(forCount count: Int) -> Int
+    @objc optional var fixedIncrement: Int { get }
+}
+
+class Counter {
+    var count = 0
+    var dataSource: CounterDataSource?
+    func increment() {
+        if let amount = dataSource?.increment?(forCount: count) {
+            count += amount
+        } else if let amount = dataSource?.fixedIncrement {
+            count += amount
+        }
+    }
+}
+
+//use
+
+class ThreeSource: NSObject, CounterDataSource {
+    let fixedIncrement: Int = 3
+}
+
+var counter1 = Counter()
+counter1.dataSource = ThreeSource()
+for _ in 0..<4 {
+    counter1.increment()
+    print(counter1.count)
+}
