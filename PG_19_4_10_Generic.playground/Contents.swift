@@ -169,4 +169,133 @@ if let index = findIndexG(off: 2, in: [1, 9, 8, 2, 5, 6, 10, 3]) {
 
 
 //ASSOCIATED TYPES
+//khi định nghĩa protocol ta đôi khi cần định nghĩa 1 or nhiều associated types
+//associated types hiểu như đại diện cho kiểu dữ liệu bất kì để mà ta có thể refer đến cho tiện...
+//...ở bên trong body của protocol.
+//thế nên associated types chỉ tồn tại trong protocol???
+//kiểu dữ liệu đại diện này sẽ được infer ra khi mà protocol được adopt bởi 1 kiểu khác
 
+//simple example
+
+protocol Container {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+}
+//như trên ta thấy Item là 1 associated type.
+//được dùng trong hàm append và subscript
+
+//ta thử viết lại IntStack struct mà conform Container
+//Non-generic version
+
+struct IntStackWay2: Container {
+    //original Intstack Implement
+    var items = [Int]()
+    mutating func push(_ item: Int) {
+        items.append(item)
+    }
+    mutating func pop() -> Int {
+        return items.removeLast()
+    }
+    //conforming Container protocol
+    //ở đây ta có nói rằng kiểu Item ở Container protocol chính là kiểu Int ở trường hợp này
+    //thật ra không cần dòng ngay dưới đây. Swift có thể infer ra đuọc dựa vào kiểu trả về của subscript or kiểu tham số của append
+    typealias Item = Int
+    mutating func append(_ item: Int) {
+        items.append(item)
+    }
+    var count: Int {
+        return items.count
+    }
+    subscript(i: Int) -> Int {
+        return items[i]
+    }
+}
+
+
+//bây giờ khó hơn, ta sẽ viết lại generic Stack mà conform Container protocol
+//Generic Version
+
+
+struct StackWay2<Element>: Container {
+    //original Stack Implement
+    var items = [Element]()
+    mutating func push(_ item: Element) {
+        items.append(item)
+    }
+    mutating func pop() -> Element {
+        return items.removeLast()
+    }
+    //conforming protocol Container
+    var count: Int {
+        return items.count
+    }
+    mutating func append(_ item: Element) {
+        items.append(item)
+    }
+    subscript(i: Int) -> Element {
+        return items[i]
+    }
+}
+//khó hơn tuy nhiên cũng đơn giản phải không?
+//chú ý ở đây ta không hề dùng typealias nhưng swift vẫn hiểu được nhé
+//vi diệu không? :))
+
+
+//bây giờ thử dùng xem
+
+var stackway222 = StackWay2<String>()
+stackway222.append("Nhi")
+stackway222.append("Giang")
+
+print("count: \(stackway222.count)")
+print("First: \(stackway222[0])")
+
+
+//ADDING Constraints to an Associated Type
+//nhắc đến constraints là cứ nhớ đến dấu ":" (dấu hai chấm)
+//hoặc là mệnh đề Where
+//xem code cho dễ hiểu
+
+protocol ContainerV2 {
+    associatedtype Item: Equatable
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+}
+//như trên có nghĩa là khi 1 type khác adopt ContainerV2 protocol thì
+//thì kiểu dữ liệu của parameter có tên là item phải conform được protocol Equatable
+
+//ví dụ luôn cho nóng
+
+struct Stackv3<Element>: ContainerV2 where Element: Equatable{
+    var items = [Element]()
+    var count: Int {
+        return items.count
+    }
+    mutating func append(_ item: Element) {
+        items.append(item)
+    }
+    subscript(i: Int) -> Element {
+        return items[i]
+    }
+}
+//khi định nghĩa Stackv3 ta đã có chỉ ra rằng generic type (Element) phải conform được Equatable...
+//...bằng mệnh đề where. Như vậy là Element đã thoả mãn được Constraints của Associated type.
+
+
+
+//USING a protocol in its Associated type's constraints
+
+//protocol mà associated type của nó có constraints đến chính protocol đó
+//hao hao như đệ quy
+//lại mệt rồi
+
+
+//example
+
+protocol SuffixableContainer: ContainerV2 {
+    associatedtype Suffix: SuffixableContainer where Suffix.Item == Item
+    func suffix(_ size: Int) -> Suffix
+}
