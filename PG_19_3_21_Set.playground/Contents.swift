@@ -6,10 +6,9 @@ import UIKit
 class Person : Hashable {
     var name: String
     var age: Int
-    var hashValue: Int {
-        get {
-            return age
-        }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(age)
     }
     init(name: String, age: Int) {
         self.name = name
