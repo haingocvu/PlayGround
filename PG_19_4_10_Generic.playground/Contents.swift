@@ -299,3 +299,113 @@ protocol SuffixableContainer: ContainerV2 {
     associatedtype Suffix: SuffixableContainer where Suffix.Item == Item
     func suffix(_ size: Int) -> Suffix
 }
+
+//kiểu dữ liệu Suffix này có 2 constraints là:
+//1 là phải conform được SuffixableContainer
+//2 là Item type của Suffix phải the same như Item type của containerv2
+//thật sự thì mình không hiểu ở chỗ này, chả nhẽ có trường hợp mà Item type của Suffix khác Item type của ContainerV2 sao????
+
+
+//bây giờ thử để StackV3 adopt protocol SuffixableContainer bằng cách thực hiện extension
+
+extension Stackv3: SuffixableContainer {
+    func suffix(_ size: Int) -> Stackv3 {
+        var result = Stackv3()
+        for i in (count - size)..<count {
+            result.append(self[i])
+        }
+        return result
+    }
+}
+
+//dùng thử
+
+var stack33 = Stackv3<Int>()
+stack33.append(22)
+stack33.append(88)
+stack33.append(99)
+
+let suffix2 = stack33.suffix(2)
+print(suffix2)
+
+
+//another example của việc dùng SuffixableContainer
+//bây giờ ta dùng trên non-generic version của Stack gọi là IntStackWay2
+
+extension IntStackWay2: SuffixableContainer {
+    //vì thằng Stackv3 đã adopt thằng SuffixableContainer nên ta có thể dùng nó như kiểu trả về của hàm suffix
+    func suffix(_ size: Int) -> Stackv3<Int> {
+        var result = Stackv3<Int>()
+        for i in (count - size)..<count {
+            result.append(self[i])
+        }
+        return result
+    }
+}
+
+//thử dùng xem
+
+var intstackw222 = IntStackWay2()
+intstackw222.append(2)
+intstackw222.append(8)
+intstackw222.append(10)
+let suffix3 = intstackw222.suffix(2)
+print(suffix3)
+
+
+//GENERIC where clauses
+//type constraints (dấu :) được dùng định nghĩa constraints cho generic type của function, subscript, or type
+//còn để định nghĩa constraints cho associated type (type trong protocol mà có chữ associated phía trước) ...
+//...ta dùng mệnh đề where
+//You write a generic where clause right before the opening curly brace of a type or function’s body.
+
+
+//example
+func allItemsMatch<C1: ContainerV2, C2: ContainerV2>(_ someContainer: C1, _ anotherContainer: C2) -> Bool
+    where C1.Item == C2.Item
+{
+    //C1: ContainerV2 nghĩa là generic type C1 phải conform được protocol ContainerV2
+    //tương tự cho C2
+    //where C1.Item == C2.Item
+    //ý nói rằng: kiểu dữ liệu của container1 (C1) phải the same kiểu dữ liệu của container2 (C2)
+    //mục đích của việc này là để ta có thể so sánh được
+    //theo như ví dụ thì là vầy
+    //where C1.Item == C2.Item, C1.Item: Equatable
+    //tuy nhiên ở ContainerV2 ta đã chỉ rõ rằng Item type phải conform Equatable rồi nên
+    //nên không cần phải làm vậy nữa, sẽ dư code.
+    //protocol với assicoated type có nên gọi là Generic Protocol không nhỉ??? :))
+    //giờ cài đặt logic thôi
+    
+    //for false case
+    if someContainer.count != anotherContainer.count { return false }
+    //mình dùng được someContainer.count vì nó có requirement property là count
+    for i in 0..<someContainer.count {
+        if someContainer[i] != anotherContainer[i] { return false }
+        //mình dùng được dạng someContainer[i] được vì nó có requirement là subscript
+    }
+    
+    //all match
+    return true
+}
+
+//dùng thử
+
+var stackv3333 = Stackv3<String>()
+stackv3333.append("Nhi")
+stackv3333.append("Giang")
+stackv3333.append("Ngan")
+
+var arrayOfStrings = ["Nhi", "Giang", "Ngan"]
+
+//do lười biếng nên thôi cứ lấy clone thằng stackv3333 ra thôi rồi so sánh cho nhanh
+
+var stackv3333333 = stackv3333
+
+var rsult = allItemsMatch(stackv3333, stackv3333333)
+print("ket qua là: \(rsult)")
+
+
+
+//EXTENSION with a generic where clause
+
+
