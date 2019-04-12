@@ -270,6 +270,8 @@ protocol ContainerV2 {
 //ví dụ luôn cho nóng
 
 struct Stackv3<Element>: ContainerV2 where Element: Equatable{
+    //ta viết như vầy có nghĩa là generic stackv3 chỉ có thể được khởi tạo bởi
+    //bởi những kiểu dữ liệu mà adopt được Equatable protocol
     var items = [Element]()
     var count: Int {
         return items.count
@@ -407,5 +409,118 @@ print("ket qua là: \(rsult)")
 
 
 //EXTENSION with a generic where clause
+//You can also use a generic where clause as part of an extension
+
+extension Stackv3 where Element: Equatable {
+    //nghĩa là
+    //Stack mà generic type của nó phải conform được Equâtble thì mới có được extension sau
+    //generic where clause dùng với kiểu
+    func isTop(_ item: Element) -> Bool {
+        guard let top = items.last else {
+            return false
+        }
+        return top == item
+    }
+}
+
+if stackv3333.isTop("Ngan") {
+    print("top is Ngan")
+} else {
+    print("top is something else")
+}
+
+//YOU can use generic where clause with extension to a protocol
+
+extension ContainerV2 where Item: Equatable {
+    func startWith(_ item: Item) -> Bool {
+        return count >= 1 && self[0] == item
+        //self trong protocol theo mình hiểu nó có nghĩa là calling object (instance)
+        //tức là cái lớp cụ thể sẽ implement cái protocol đó
+        //và do cái thằng mà implement cái protocol này bắt buộc định nghĩa subscript
+        //nên đơn giản ta có thể dùng được self[0] -> đây là subscript
+    }
+}
+
+//dùng thử
+
+var stackv388 = Stackv3<Int>()
+stackv388.append(2)
+stackv388.append(8)
+var startWith2 = stackv388.startWith(2)
+print("start with 2: \(startWith2)")
 
 
+
+//another example cho việc sử dụng generic where clause khi extension protocol
+
+extension ContainerV2 where Item == Double {
+    func average() -> Double {
+        var sum = 0.0
+        for i in 0..<count {
+            sum += self[i]
+        }
+        return sum/Double(count)
+    }
+}
+
+var stackv399 = Stackv3<Double>()
+stackv399.append(10.0)
+stackv399.append(8.0)
+
+print("trung binh la: \(stackv399.average())")
+//You can include multiple requirements in a generic where clause that is part of an extension, just like you can for a
+//generic where clause that you write elsewhere. Separate each requirement in the list with a comma.
+
+
+//ASSOCIATED TYPE WITH A GENERIC WHERE CLAUSE
+//you can include a generic where clause on an associated type
+
+//example
+//For example, suppose you want to make a version of Container that includes an iterator,
+//like what the Sequence protocol uses in the standard library. Here’s how you write that:
+
+//có thể nói protocol với associated type là generic protocol??
+protocol ContainerV3 {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+    
+    //associated type with where clause
+    associatedtype Iterator: IteratorProtocol where Iterator.Element == Item
+    //trước tiên ta nên hình dung ra là Iterator là 1 đối tượng mà là
+    //1 người có nhiệm vụ là sẽ kiểu như duyệt qua từng phần tử con của nó
+    //chúng ta mở protocol IteratorProtocol lên xem thì sẽ có hàm next() -> ý nói là phần tử tiếp theo
+    //có nghĩa là: Iterator phải conform được IteratorProtocol và
+    //và các phần tử được lưu trong Iterator phải cùng kiểu với Item (generic type của containerv3)
+    func makeIterator() -> Iterator
+}
+
+
+//NOTE:
+//chú ý: khi định nghĩa 1 protocol mà protocol đó kế thừa từ 1 protocol khác thì ta sẽ định nghĩa
+//constraints (where clause) cho associated type kế thừa được như sau
+
+//example
+protocol ComparableContainer: ContainerV3 where Item: Comparable {}
+
+//mấu chốt là cứ constraints thì nghĩ ngay tới dấu : và generic where clause
+//vận dụng kết hợp và suy luận từ việc kế thừa, extension các kiểu
+//nói chung ban đầu khó, làm quen chắc dễ :))
+
+
+//GENERIC SUBSCRIPT
+
+extension ContainerV3 {
+    subscript<Indices: Sequence>(indices: Indices) -> [Item]
+        where Indices.Iterator.Element == Int {
+        var rs = [Item]()
+        for i in indices {
+            rs.append(self[i])
+        }
+        return rs
+    }
+}
+
+
+//Taken together, these constraints mean that the value passed for the indices parameter is a sequence of integers.
